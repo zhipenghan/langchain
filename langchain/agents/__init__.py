@@ -14,12 +14,14 @@ from langchain.agents.initialize import initialize_agent
 from langchain.agents.load_tools import get_all_tool_names, load_tools
 from langchain.agents.loading import load_agent
 from langchain.agents.mrkl.base import MRKLChain, ZeroShotAgent
+from langchain.agents.my.base import MyMRKLChain, MyZeroShotAgent
 from langchain.agents.react.base import ReActChain, ReActTextWorldAgent
 from langchain.agents.self_ask_with_search.base import SelfAskWithSearchChain
 from langchain.agents.tools import Tool, tool
 
 __all__ = [
     "MRKLChain",
+    "MyMRKLChain",
     "SelfAskWithSearchChain",
     "ReActChain",
     "AgentExecutor",
@@ -27,6 +29,7 @@ __all__ = [
     "Tool",
     "tool",
     "initialize_agent",
+    "MyZeroShotAgent",
     "ZeroShotAgent",
     "ReActTextWorldAgent",
     "load_tools",

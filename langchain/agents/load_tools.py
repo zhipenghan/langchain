@@ -22,6 +22,9 @@ from langchain.utilities.google_search import GoogleSearchAPIWrapper
 from langchain.utilities.google_serper import GoogleSerperAPIWrapper
 from langchain.utilities.searx_search import SearxSearchWrapper
 from langchain.utilities.serpapi import SerpAPIWrapper
+from langchain.utilities.bing_search import BingSearchAPIWrapper
+from langchain.utilities.recall_search import RecallSearchAPIWrapper
+from langchain.utilities.graph_search import GraphSearchAPIWrapper
 from langchain.utilities.wolfram_alpha import WolframAlphaAPIWrapper
 
 
@@ -67,7 +70,7 @@ def _get_pal_colored_objects(llm: BaseLLM) -> BaseTool:
 def _get_llm_math(llm: BaseLLM) -> BaseTool:
     return Tool(
         name="Calculator",
-        description="Useful for when you need to answer questions about math.",
+        description="Useful for when you need to answer questions need math calculation.",
         func=LLMMathChain(llm=llm, callback_manager=llm.callback_manager).run,
         coroutine=LLMMathChain(llm=llm, callback_manager=llm.callback_manager).arun,
     )
@@ -145,10 +148,49 @@ def _get_serpapi(**kwargs: Any) -> BaseTool:
     )
 
 
+def _get_bing_search(**kwargs: Any) -> Tool:
+    return Tool(
+        "Bing Search",
+        BingSearchAPIWrapper(**kwargs).run,
+        "A wrapper around Bing Search. Useful for when you need to answer questions about current events. Input should be a search query.",
+    )
+
+def _get_stock_search(**kwargs: Any) -> Tool:
+    return Tool(
+        "Bing Stock",
+        BingSearchAPIWrapper(**kwargs).run_stock,
+        "A wrapper around Stock Search. Useful for when you need to answer questions about stock prices. Input should be a search query.",
+    )
+
+
+def _get_weather_search(**kwargs: Any) -> Tool:
+    return Tool(
+        "Bing Weather",
+        BingSearchAPIWrapper(**kwargs).run_weather,
+        "A wrapper around Weather Search. Useful for when you need to answer questions about weather. Input should be a search query.",
+    )
+
+
+def _get_people_search(**kwargs: Any) -> Tool:
+    return Tool(
+        "Get Manager",
+        GraphSearchAPIWrapper(**kwargs).run_manager,
+        "A wrapper around People Search. Useful for when you need to answer questions about manager, people work with. Input should be people name or me or you."
+    )
+
+
+def _get_recall_search(**kwargs: Any) -> Tool:
+    return Tool(
+        "Recall Search",
+        RecallSearchAPIWrapper(**kwargs).run_stock,
+        "A wrapper of Bing Stock Search. Recall contains the user recent used documents in Word, PowerPoint, OneNotes, Emails. Useful when you need answer questions about users recent documents, emails. Input should be a search query."
+    )
+
+
 def _get_searx_search(**kwargs: Any) -> BaseTool:
     return Tool(
         name="SearX Search",
-        description="A meta search engine. Useful for when you need to answer questions about current events. Input should be a search query.",
+        description="A meta search engine. Useful for when you need to answer questions about current events. Input should be a search query.  When have multiple queries, search one by one.",
         func=SearxSearchWrapper(**kwargs).run,
     )
 
@@ -170,6 +212,9 @@ _EXTRA_OPTIONAL_TOOLS = {
         ["google_api_key", "google_cse_id", "num_results"],
     ),
     "bing-search": (_get_bing_search, ["bing_subscription_key", "bing_search_url"]),
+    "stock-search": (_get_stock_search, ["bing_subscription_key", "bing_search_url"]),
+    "weather-search": (_get_weather_search, ["bing_subscription_key", "bing_search_url"]),
+    "graph-search": (_get_people_search, ["graph_search_key", "graph_search_url"]),   
     "google-serper": (_get_google_serper, ["serper_api_key"]),
     "serpapi": (_get_serpapi, ["serpapi_api_key", "aiosession"]),
     "searx-search": (_get_searx_search, ["searx_host"]),

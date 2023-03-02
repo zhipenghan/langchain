@@ -1,7 +1,5 @@
-"""Util that calls Bing Search.
-
-In order to set this up, follow instructions at:
-https://levelup.gitconnected.com/api-tutorial-how-to-use-bing-web-search-api-in-python-4165d5592a7e
+"""Util that calls Recall Search.
+# TODO: not implemente yet
 """
 from typing import Dict, List
 
@@ -11,15 +9,15 @@ from pydantic import BaseModel, Extra, root_validator
 from langchain.utils import get_from_dict_or_env
 
 
-class BingSearchAPIWrapper(BaseModel):
-    """Wrapper for Bing Search API.
+class RecallSearchAPIWrapper(BaseModel):
+    """Wrapper for Recall Search API.
 
     In order to set this up, follow instructions at:
     https://levelup.gitconnected.com/api-tutorial-how-to-use-bing-web-search-api-in-python-4165d5592a7e
     """
 
     bing_subscription_key: str
-    bing_search_url: str
+    recall_search_url: str
     k: int = 10
 
     class Config:
@@ -32,6 +30,8 @@ class BingSearchAPIWrapper(BaseModel):
         params = {
             "q": search_term,
             "count": count,
+            "textDecorations": True,
+            "textFormat": "HTML",
         }
         response = requests.get(
             self.bing_search_url, headers=headers, params=params  # type: ignore
@@ -62,29 +62,7 @@ class BingSearchAPIWrapper(BaseModel):
     def run(self, query: str) -> str:
         """Run query through BingSearch and parse result."""
         snippets = []
-        results = self._bing_search_results(query, count=2)
-        if len(results) == 0:
-            return "No good Bing Search Result was found"
-        for result in results:
-            snippets.append(result["snippet"])
-
-        return " ".join(snippets)
-    
-    def run_stock(self, query: str) -> str:
-        """Run query through BingSearch and parse result."""
-        snippets = []
-        results = self._bing_search_results(query + " stock price", count=1)
-        if len(results) == 0:
-            return "No good Bing Search Result was found"
-        for result in results:
-            snippets.append(result["snippet"])
-
-        return " ".join(snippets)
-    
-    def run_weather(self, query: str) -> str:
-        """Run query through BingSearch and parse result."""
-        snippets = []
-        results = self._bing_search_results(query + " weather", count=1)
+        results = self._bing_search_results(query, count=self.k)
         if len(results) == 0:
             return "No good Bing Search Result was found"
         for result in results:
